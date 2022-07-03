@@ -8,7 +8,7 @@ Test: object creation
 it('Test Ship factory - Returned object', () => {
   const testBoard = Gameboard();
 
-  expect(testBoard.board).toStrictEqual({});
+  expect(testBoard.ships).toStrictEqual({});
   expect(testBoard.missed).toStrictEqual([]);
   expect(testBoard).toMatchObject({
     receiveAttack: expect.any(Function),
@@ -28,7 +28,7 @@ it('Gameboard factory - placeShip function - a', () => {
 
   testBoard.placeShip(testShipA, testPos);
 
-  expect(testBoard.board).toStrictEqual({
+  expect(testBoard.ships).toStrictEqual({
     ship0: [testShipA, [[0, 0], [0, 1], [0, 2]]],
   });
 });
@@ -40,7 +40,7 @@ it('Gameboard factory - placeShip function - b', () => {
 
   testBoard.placeShip(testShipA, testPos);
 
-  expect(testBoard.board).toStrictEqual({
+  expect(testBoard.ships).toStrictEqual({
     ship0: [testShipA, [[4, 7], [4, 8], [4, 9]]],
   });
 });
@@ -55,7 +55,7 @@ it('Gameboard factory - placeShip function - Multiple ships', () => {
   testBoard.placeShip(testShipA, testPos);
   testBoard.placeShip(testShipB, testPos2);
 
-  expect(testBoard.board).toStrictEqual({
+  expect(testBoard.ships).toStrictEqual({
     ship0: [testShipA, [[4, 7], [4, 8], [4, 9]]],
     ship1: [testShipB, [[2, 4]]],
   });
@@ -69,7 +69,7 @@ it('Gameboard factory - placeShip function - Ship placed vertically', () => {
   testBoard.placeShip(testShipA, testPos);
   testBoard.placeShip(testShipA, testPos, true);
 
-  expect(testBoard.board).toStrictEqual({
+  expect(testBoard.ships).toStrictEqual({
     ship0: [testShipA, [[4, 7], [4, 8], [4, 9]]],
     ship1: [testShipA, [[4, 7], [5, 7], [6, 7]]],
   });
@@ -89,8 +89,8 @@ it('Gameboard factory - receiveAttack function - Hit - a', () => {
   testBoard.placeShip(testShipB, [2, 3], true);
 
   testBoard.receiveAttack([4, 8]);
-  expect(testBoard.board.ship0[0].shipArray).toStrictEqual(['o', 'x', 'o']);
-  expect(testBoard.board.ship1[0].shipArray).toStrictEqual(['o']);
+  expect(testBoard.ships.ship0[0].shipArray).toStrictEqual(['o', 'x', 'o']);
+  expect(testBoard.ships.ship1[0].shipArray).toStrictEqual(['o']);
 });
 
 it('Gameboard factory - receiveAttack function - Hit - b', () => {
@@ -103,8 +103,8 @@ it('Gameboard factory - receiveAttack function - Hit - b', () => {
   testBoard.placeShip(testShipB, [2, 3], true);
 
   testBoard.receiveAttack([3, 3]);
-  expect(testBoard.board.ship0[0].shipArray).toStrictEqual(['o', 'o', 'o']);
-  expect(testBoard.board.ship1[0].shipArray).toStrictEqual(['o', 'x']);
+  expect(testBoard.ships.ship0[0].shipArray).toStrictEqual(['o', 'o', 'o']);
+  expect(testBoard.ships.ship1[0].shipArray).toStrictEqual(['o', 'x']);
 });
 
 // Test: missed attribute
