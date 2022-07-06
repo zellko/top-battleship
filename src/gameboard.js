@@ -1,6 +1,7 @@
 /* eslint-disable no-plusplus */
 const Gameboard = () => {
   const ships = { };
+  const allShipsPosition = [];
   const missed = [];
 
   const placeShip = (ship, position, isVertical) => {
@@ -11,20 +12,20 @@ const Gameboard = () => {
     const shipPosition = [];
 
     for (let index = 0; index < ship.shipArray.length; index++) {
-      let posX;
-      let posY;
+      let pos;
+
       if (isVertical) {
-        posX = position[0] + index;
-        posY = position[1];
+        pos = position + (10 * index);
       } else {
-        posX = position[0];
-        posY = position[1] + index;
+        pos = position + index;
       }
 
-      shipPosition.push([posX, posY]);
+      shipPosition.push(pos);
+      allShipsPosition.push(pos);
     }
 
     ships[keyValue] = [ship, shipPosition];
+
     return ships;
   };
   const receiveAttack = (hitPos) => {
@@ -34,7 +35,7 @@ const Gameboard = () => {
 
       for (let index = 0; index < shipPosition.length; index++) {
         const position = shipPosition[index];
-        if (position[0] === hitPos[0] && position[1] === hitPos[1]) {
+        if (position === hitPos) {
           ship.hit(index + 1);
           return 'hit';
         }
@@ -56,7 +57,7 @@ const Gameboard = () => {
   };
 
   return {
-    ships, missed, placeShip, receiveAttack, areShipsSunk,
+    ships, missed, placeShip, receiveAttack, areShipsSunk, allShipsPosition,
   };
 };
 

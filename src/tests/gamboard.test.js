@@ -23,32 +23,32 @@ Test: placeShip function
 
 it('Gameboard factory - placeShip function - a', () => {
   const testBoard = Gameboard();
-  const testPos = [0, 0];
+  const testPos = 0;
   const testShipA = Ship(3);
 
   testBoard.placeShip(testShipA, testPos);
 
   expect(testBoard.ships).toStrictEqual({
-    ship0: [testShipA, [[0, 0], [0, 1], [0, 2]]],
+    ship0: [testShipA, [0, 1, 2]],
   });
 });
 
 it('Gameboard factory - placeShip function - b', () => {
   const testBoard = Gameboard();
-  const testPos = [4, 7];
+  const testPos = 22;
   const testShipA = Ship(3);
 
   testBoard.placeShip(testShipA, testPos);
 
   expect(testBoard.ships).toStrictEqual({
-    ship0: [testShipA, [[4, 7], [4, 8], [4, 9]]],
+    ship0: [testShipA, [22, 23, 24]],
   });
 });
 
 it('Gameboard factory - placeShip function - Multiple ships', () => {
   const testBoard = Gameboard();
-  const testPos = [4, 7];
-  const testPos2 = [2, 4];
+  const testPos = 0;
+  const testPos2 = 22;
   const testShipA = Ship(3);
   const testShipB = Ship(1);
 
@@ -56,28 +56,29 @@ it('Gameboard factory - placeShip function - Multiple ships', () => {
   testBoard.placeShip(testShipB, testPos2);
 
   expect(testBoard.ships).toStrictEqual({
-    ship0: [testShipA, [[4, 7], [4, 8], [4, 9]]],
-    ship1: [testShipB, [[2, 4]]],
+    ship0: [testShipA, [0, 1, 2]],
+    ship1: [testShipB, [22]],
   });
 });
 
 it('Gameboard factory - placeShip function - Ship placed vertically', () => {
   const testBoard = Gameboard();
-  const testPos = [4, 7];
+  const testPosA = 0;
+  const testPosB = 21;
   const testShipA = Ship(3);
 
-  testBoard.placeShip(testShipA, testPos);
-  testBoard.placeShip(testShipA, testPos, true);
+  testBoard.placeShip(testShipA, testPosA);
+  testBoard.placeShip(testShipA, testPosB, true);
 
   expect(testBoard.ships).toStrictEqual({
-    ship0: [testShipA, [[4, 7], [4, 8], [4, 9]]],
-    ship1: [testShipA, [[4, 7], [5, 7], [6, 7]]],
+    ship0: [testShipA, [0, 1, 2]],
+    ship1: [testShipA, [21, 31, 41]],
   });
 });
 
-/** *****************************
-Test: receiveAttack function
-******************************* */
+// /** *****************************
+// Test: receiveAttack function
+// ******************************* */
 
 it('Gameboard factory - receiveAttack function - Hit - a', () => {
   const testBoard = Gameboard();
@@ -85,10 +86,10 @@ it('Gameboard factory - receiveAttack function - Hit - a', () => {
   const testShipA = Ship(3);
   const testShipB = Ship(1);
 
-  testBoard.placeShip(testShipA, [4, 7]);
-  testBoard.placeShip(testShipB, [2, 3], true);
+  testBoard.placeShip(testShipA, 0);
+  testBoard.placeShip(testShipB, 21, true);
 
-  testBoard.receiveAttack([4, 8]);
+  testBoard.receiveAttack(1);
   expect(testBoard.ships.ship0[0].shipArray).toStrictEqual(['o', 'x', 'o']);
   expect(testBoard.ships.ship1[0].shipArray).toStrictEqual(['o']);
 });
@@ -99,15 +100,15 @@ it('Gameboard factory - receiveAttack function - Hit - b', () => {
   const testShipA = Ship(3);
   const testShipB = Ship(2);
 
-  testBoard.placeShip(testShipA, [4, 7]);
-  testBoard.placeShip(testShipB, [2, 3], true);
+  testBoard.placeShip(testShipA, 0);
+  testBoard.placeShip(testShipB, 21, true);
 
-  testBoard.receiveAttack([3, 3]);
+  testBoard.receiveAttack(31);
   expect(testBoard.ships.ship0[0].shipArray).toStrictEqual(['o', 'o', 'o']);
   expect(testBoard.ships.ship1[0].shipArray).toStrictEqual(['o', 'x']);
 });
 
-// Test: missed attribute
+// // Test: missed attribute
 
 it('Gameboard factory - receiveAttack function - Miss', () => {
   const testBoard = Gameboard();
@@ -115,17 +116,17 @@ it('Gameboard factory - receiveAttack function - Miss', () => {
   const testShipA = Ship(3);
   const testShipB = Ship(1);
 
-  testBoard.placeShip(testShipA, [4, 7]);
-  testBoard.placeShip(testShipB, [2, 3], true);
+  testBoard.placeShip(testShipA, 0);
+  testBoard.placeShip(testShipB, 21, true);
 
-  testBoard.receiveAttack([4, 10]);
-  testBoard.receiveAttack([3, 7]);
-  expect(testBoard.missed).toStrictEqual([[4, 10], [3, 7]]);
+  testBoard.receiveAttack(3);
+  testBoard.receiveAttack(22);
+  expect(testBoard.missed).toStrictEqual([3, 22]);
 });
 
-/** *****************************
-Test: areShipsSunk function
-******************************* */
+// /** *****************************
+// Test: areShipsSunk function
+// ******************************* */
 
 it('Gameboard factory - areShipsSunk function - true', () => {
   const testBoard = Gameboard();
@@ -133,12 +134,12 @@ it('Gameboard factory - areShipsSunk function - true', () => {
   const testShipA = Ship(2);
   const testShipB = Ship(1);
 
-  testBoard.placeShip(testShipA, [4, 7], true);
-  testBoard.placeShip(testShipB, [2, 3]);
+  testBoard.placeShip(testShipA, 21, true);
+  testBoard.placeShip(testShipB, 0);
 
-  testBoard.receiveAttack([4, 7]);
-  testBoard.receiveAttack([5, 7]);
-  testBoard.receiveAttack([2, 3]);
+  testBoard.receiveAttack(0);
+  testBoard.receiveAttack(21);
+  testBoard.receiveAttack(31);
 
   expect(testBoard.areShipsSunk()).toBe(true);
 });
@@ -149,10 +150,12 @@ it('Gameboard factory - areShipsSunk function - false', () => {
   const testShipA = Ship(3);
   const testShipB = Ship(1);
 
-  testBoard.placeShip(testShipA, [4, 7]);
-  testBoard.placeShip(testShipB, [2, 3]);
+  testBoard.placeShip(testShipA, 21, true);
+  testBoard.placeShip(testShipB, 0);
 
-  testBoard.receiveAttack([4, 7]);
-  testBoard.receiveAttack([2, 3]);
+  testBoard.receiveAttack(0);
+  testBoard.receiveAttack(21);
+  testBoard.receiveAttack(32);
+
   expect(testBoard.areShipsSunk()).toBe(false);
 });
