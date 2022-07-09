@@ -24,7 +24,7 @@ Test: aiAttack function
 // Mock Math.randon() function
 
 beforeEach(() => {
-  jest.spyOn(global.Math, 'random').mockReturnValue(0.8);
+  jest.spyOn(global.Math, 'random').mockReturnValue(0.79);
 });
 
 afterEach(() => {
@@ -33,11 +33,10 @@ afterEach(() => {
 
 it('Player factory - aiAttack function - Random cell - a ', () => {
   const testPlayer = Player();
-  expect(testPlayer.aiAttack([[0, 0], [0, 1], [0, 2], [3, 3]])).toStrictEqual([3, 3]);
+  expect(testPlayer.aiAttack([0, 1, 2, 3])).toStrictEqual(3);
 });
 
 it('Player factory - aiAttack function - Random cell - b', () => {
   const testPlayer = Player();
-  expect(testPlayer.aiAttack([[0, 0], [0, 1], [0, 2], [3, 3], [5, 5],
-    [1, 0], [1, 1], [1, 2], [1, 3], [1, 5]])).toStrictEqual([1, 3]);
+  expect(testPlayer.aiAttack([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])).toStrictEqual(8);
 });

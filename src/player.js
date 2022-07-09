@@ -2,9 +2,9 @@ const Player = (board) => {
   const aiAttack = (legalPosition) => {
     const numberOfLegalPos = legalPosition.length;
 
-    const r = Math.floor(Math.random() * numberOfLegalPos);
+    const randomPos = Math.floor(Math.random() * numberOfLegalPos);
 
-    return legalPosition[r];
+    return randomPos;
   };
   return { board, aiAttack };
 };
