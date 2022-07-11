@@ -1,32 +1,73 @@
 /* eslint-disable no-plusplus */
 const Gameboard = () => {
-  const ships = { };
   const allShipsPosition = [];
   const missed = [];
   const hit = [];
+  const ships = { };
+
+  function checkPosition(shipPosition, isVertical, oldShipPosition) {
+    // Function to check if position is valid
+
+    // First, we remove shipPosition from allShipsPosition
+    const shipsPositions = [...allShipsPosition];
+
+    if (oldShipPosition !== undefined) {
+      const index = shipsPositions.indexOf(oldShipPosition[0]);
+      shipsPositions.splice(index, oldShipPosition.length);
+    }
+
+    // Check that position are not already used by another ship...
+    const isAlreadyUsed = shipPosition.some((element) => shipsPositions.includes(element));
+
+    // Check that ship is not adjacent to another ship...
+    const isAdjacent = shipPosition.some((element) => {
+      if (shipsPositions.includes(element + 1) && Math.floor(element / 10) === Math.floor((element + 1) / 10)) return true;
+      if (shipsPositions.includes(element - 1) && Math.floor(element / 10) === Math.floor((element - 1) / 10)) return true;
+      if (shipsPositions.includes(element + 10)) return true;
+      if (shipsPositions.includes(element - 10)) return true;
+      return false;
+    });
+
+    // Check that position are not overflowing board...
+    const isOverflow = shipPosition.some((element) => element > 99);
+
+    // Check that position are not wrapping over 2 lines...
+    let isWrapping = false;
+    if (!isVertical) {
+      isWrapping = (Math.floor(shipPosition[0] / 10) !== Math.floor(shipPosition[shipPosition.length - 1] / 10));
+    }
+
+    if (isAlreadyUsed || isAdjacent || isOverflow || isWrapping) {
+      return false;
+    }
+
+    return true;
+  }
 
   const placeShip = (ship, position, isVertical) => {
     const boardKeys = Object.keys(ships);
     const boardLength = boardKeys.length;
     const keyValue = `ship${boardLength}`;
-
     const shipPosition = [];
+
+    let shipOrientation = isVertical;
+
+    if (isVertical === undefined) shipOrientation = false;
 
     for (let index = 0; index < ship.shipArray.length; index++) {
       let pos;
 
-      if (isVertical) {
+      if (shipOrientation) {
         pos = position + (10 * index);
       } else {
         pos = position + index;
       }
 
       shipPosition.push(pos);
-      allShipsPosition.push(pos);
     }
 
-    ships[keyValue] = [ship, shipPosition];
-
+    ships[keyValue] = [ship, shipPosition, shipOrientation];
+    updateShipsPosition();
     return ships;
   };
 
@@ -63,42 +104,8 @@ const Gameboard = () => {
           shipPosition.push(pos);
         }
 
-        // Check that position are not already used by another ship...
-        const isAlreadyUsed = shipPosition.some((element) => allShipsPosition.includes(element));
-        if (isAlreadyUsed) {
-          console.log('POSITION ALREADY USED');
-          continue; // if yes, redo the loop with new random position
-        }
-
-        // Check that ship is not adjacent to another ship...
-        const isAdjacent = shipPosition.some((element) => {
-          if (allShipsPosition.includes(element + 1)) return true;
-          if (allShipsPosition.includes(element - 1)) return true;
-          if (allShipsPosition.includes(element + 10)) return true;
-          if (allShipsPosition.includes(element - 10)) return true;
-          return false;
-        });
-
-        if (isAdjacent) {
-          console.log('isAdjacent');
-          continue; // if yes, redo the loop with new random position
-        }
-
-        // Check that position are not overflowing board...
-        const isOverflow = shipPosition.some((element) => element > 99);
-        if (isOverflow) {
-          console.log('OVERFLOW THE BOARD');
-          continue; // if yes, redo the loop with new random position
-        }
-
-        // Check that position are not wrapping over 2 lines...
-        if (!isVertical) {
-          const isWrapping = (Math.floor(shipPosition[0] / 10) !== Math.floor(shipPosition[shipPosition.length - 1] / 10));
-          if (isWrapping) {
-            console.log('Wrapping THE BOARD');
-            continue; // if yes, redo the loop with new random position
-          }
-        }
+        // Check that position is valid...
+        if (!checkPosition(shipPosition, isVertical)) continue;
 
         isValid = true;
 
@@ -129,6 +136,7 @@ const Gameboard = () => {
     missed.push(hitPos);
     return 'miss';
   };
+
   const areShipsSunk = () => {
     let allShipSunk = true;
 
@@ -140,8 +148,79 @@ const Gameboard = () => {
     return allShipSunk;
   };
 
+  const rotateShip = (position) => {
+    // If yes, get ship object...
+    for (const key in ships) {
+      const ship = ships[key];
+
+      if (ship[1].includes(position)) {
+        const isVertical = ship[2];
+        const oldShipPosition = ship[1];
+        const firstShipPosition = ship[1][0];
+        const newShipPosition = [];
+
+        // Rotate is position and update gameboard object
+        oldShipPosition.forEach((pos, index) => {
+          (isVertical)
+            ? newShipPosition.push(firstShipPosition + index)
+            : newShipPosition.push(firstShipPosition + (10 * index));
+        });
+
+        const isValid = (checkPosition(newShipPosition, !isVertical, oldShipPosition));
+
+        if (!isValid) return 'error';
+
+        ship[1] = newShipPosition;
+        ship[2] = !(isVertical);
+        updateShipsPosition();
+      }
+    }
+  };
+
+  const moveShip = (position, key) => {
+    const ship = ships[key];
+
+    const shipLength = ship[1].length;
+    const isVertical = ship[2];
+    const oldShipPosition = ship[1];
+    const newShipPosition = [];
+
+    for (let index = 0; index < shipLength; index++) {
+      const pos = (isVertical) ? position + (index * 10) : position + index;
+      newShipPosition.push(pos);
+    }
+
+    const isValid = (checkPosition(newShipPosition, isVertical, oldShipPosition));
+
+    if (!isValid) return 'error';
+
+    ship[1] = newShipPosition;
+    updateShipsPosition();
+  };
+
+  const updateShipsPosition = () => {
+    allShipsPosition.splice(0, allShipsPosition.length);
+
+    for (const key in ships) {
+      const ship = ships[key];
+      const shipPosition = ship[1];
+
+      shipPosition.forEach((pos) => allShipsPosition.push(pos));
+    }
+  };
+
   return {
-    ships, missed, placeShip, receiveAttack, areShipsSunk, allShipsPosition, hit, placeShipsRandomly,
+    allShipsPosition,
+    ships,
+    missed,
+    hit,
+    areShipsSunk,
+    placeShip,
+    placeShipsRandomly,
+    receiveAttack,
+    moveShip,
+    rotateShip,
+    updateShipsPosition,
   };
 };
 
