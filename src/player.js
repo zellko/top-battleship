@@ -1,8 +1,6 @@
 const Player = (board) => {
-  const aiAttack = (legalPosition) => {
-    const numberOfLegalPos = legalPosition.length;
-
-    const randomPos = Math.floor(Math.random() * numberOfLegalPos);
+  const aiAttack = () => {
+    const randomPos = Math.floor(Math.random() * 99);
 
     return randomPos;
   };
