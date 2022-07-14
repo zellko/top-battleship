@@ -1,108 +1,287 @@
 import './style.css';
+import dom from './dom';
 import { Ship } from './ship';
 import { Gameboard } from './gameboard';
+import { Player } from './player';
 
-const boardPosition = [
-  [0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], /* ,
-  [1, 0], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8], [1, 9],
-  [2, 0], [2, 1], [2, 2], [2, 3], [2, 4], [2, 5], [2, 6], [2, 7], [2, 8], [2, 9],
-  [3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6], [3, 7], [3, 8], [3, 9],
-  [4, 0], [4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6], [4, 7], [4, 8], [4, 9],
-  [5, 0], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5], [5, 6], [5, 7], [5, 8], [5, 9],
-  [6, 0], [6, 1], [6, 2], [6, 3], [6, 4], [6, 5], [6, 6], [6, 7], [6, 8], [6, 9],
-  [7, 0], [7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 6], [7, 7], [7, 8], [7, 9],
-  [8, 0], [8, 1], [8, 2], [8, 3], [8, 4], [8, 5], [8, 6], [8, 7], [8, 8], [8, 9],
-  [9, 0], [9, 1], [9, 2], [9, 3], [9, 4], [9, 5], [9, 6], [9, 7], [9, 8], [9, 9], */
-];
+const DomBoard = document.querySelectorAll('.board');
+const DomStartGame = document.querySelector('.btn-start');
+const DomRandomBtm = document.querySelector('.btn-random');
+let gameStatus = 'init';
+let movedShip; // Variable to store the ship currently moved
+let activePlayer = 'player1';
 
-const modifyArray = (() => {
-  const toStringify = (array) => array.map((element) => JSON.stringify(element));
-  const toParse = (array) => array.map((element) => JSON.parse(element));
+/** ***********************
+INITIALIZATION OF BOARDS
+************************* */
+const player1Board = Gameboard();
+const player2Board = Gameboard();
 
-  return { toStringify, toParse };
-})();
+const player1 = Player(player1Board);
+const player2 = Player(player2Board);
 
-/* */
-function subtractArray(array) {
-  // Function which substract provided array to all board position
+dom.createBoard(DomBoard[0]);
+dom.createBoard(DomBoard[1]);
 
-  // Convert array position to string so they can be compared with .includes
-  // const boardToString = boardPosition.map((element) => JSON.stringify(element));
-  const boardToString = modifyArray.toStringify(boardPosition);
+function iaPlay() {
+  // Function to generate a random hit position.
+  const position = player2.aiAttack();
 
-  // const arrayToString = array.map((element) => JSON.stringify(element));
-  const arrayToString = modifyArray.toStringify(array);
+  // Check if it's a valid position, the cell should not have been used already...
+  if (player1.board.missed.includes(position) || player1.board.hit.includes(position)) { iaPlay(); }
 
-  // Remove position in array (arrayToString) from boardPosition (boardToString)
-  const subtractArrayString = boardToString.filter((element) => !arrayToString.includes(element));
-  // Convert position back to array
+  // ...If it's valid, use Gameboard method receiveAttack
+  player1.board.receiveAttack(position);
 
-  // const subtractedArray = subtractArrayString.map((element) => JSON.parse(element));
-  const subtractedArray = modifyArray.toParse(subtractArrayString);
-  return subtractedArray;
+  // Update the dom...
+  dom.displayMiss(player1.board, DomBoard[0]); // attack that missed
+  dom.displayHit(player1.board, DomBoard[0]); // attack that hit
+
+  // Check if all ship are sunk...
+  if (player1.board.areShipsSunk()) {
+    dom.displayMessage('You Lost!', '');
+    gameStatus = 'ended';
+  }
 }
 
-function getPosition(ships, missed) {
-  // Function to get valid / invalid position from the board
-  const allShipsPosition = [];
+function randomShipPlacement(domB, board) {
+  // Function to place ships randomly on the board.
 
-  // For every Ship Object...
-  for (const ship in ships) {
-    // ...Get the ship position (array of every positions used by the ship)
-    const shipPosition = ships[ship][1];
-    // Push every position used by the ship to allShipsPosition array
-    for (let index = 0; index < shipPosition.length; index++) {
-      const element = shipPosition[index];
-      allShipsPosition.push(element);
-    }
+  // Clear the board
+  dom.clearBoard(domB);
+
+  // Create ships to be placed
+  const ships = [Ship(2), Ship(2), Ship(3), Ship(4), Ship(5)];
+
+  // Place ships randomly
+  board.placeShipsRandomly(ships);
+
+  // Display them on the board
+  dom.displayShips(player1.board, DomBoard[0]);
+}
+
+// Generate a random board after the page loading
+randomShipPlacement(DomBoard[0], player1.board);
+randomShipPlacement(DomBoard[1], player2.board);
+
+// Display them on the screen
+dom.displayShips(player1.board, DomBoard[0]);
+dom.displayShips(player2.board, DomBoard[1]);
+
+/** ***********************
+EVENT LISTENER
+************************* */
+
+DomRandomBtm.addEventListener('click', () => {
+  // When player click on ships "Random" placement button...
+  const player = (activePlayer === 'player1') ? player1 : player2;
+  const dom_board = (activePlayer === 'player1') ? DomBoard[0] : DomBoard[1];
+
+  // // Generate a new gameboard for active player player
+  player.board = Gameboard();
+  randomShipPlacement(dom_board, player.board);
+});
+
+DomStartGame.addEventListener('click', () => {
+  // When player click "start game"...
+
+  // If a game just ended, reset the gameboard...
+  if (gameStatus === 'ended') {
+  // // Generate a new gameboard for players
+    player1.board = Gameboard();
+    randomShipPlacement(DomBoard[0], player1.board);
+
+    player2.board = Gameboard();
+    randomShipPlacement(DomBoard[1], player2.board);
+    dom.displayMessage('Place your ships!', 'Click on a ship to move it, double click to rotate it!', 'init');
+
+    gameStatus = 'init';
+    return;
   }
 
-  const invalidPosition = allShipsPosition.concat(missed);
-  const validPosition = subtractArray(invalidPosition);
+  // ... else start a new game.
 
-  return [validPosition, invalidPosition];
-}
+  // Remove instruction/result screen
+  dom.hideDisplay();
 
-function checkPosition(gameboardShip, shipLength, pos, isVertical) {
-// When user want to place a ship on the board...
-// ... check if the position is valid (the ship should not overflow the board)
-// ... or share a position with another ship
+  // Clear boards and display randomly placed ship
+  DomBoard.forEach((board) => dom.clearBoard(board));
+  dom.displayShips(player1.board, DomBoard[0]);
+  // dom.displayShips(player2.board, DomBoard[1]);
 
-  // Determinate future ship position based on ship length and cell position
-  const futureShipPos = [pos];
-  for (let index = 1; index < shipLength; index++) {
-    let posX;
-    let posY;
+  // Set active player and reset movedShip variable
+  movedShip = undefined;
+  activePlayer = 'player1';
+
+  // Start the game loop
+  gameStatus = 'game';
+});
+
+DomBoard.forEach((board) => board.addEventListener('mouseover', (e) => {
+  // When a ship is being moved, display it on the board at his future position
+  if (![...e.target.classList].includes('cell')) return;
+  if (gameStatus !== 'movingShip') return;
+
+  // Get player board and board number
+  const playerBoard = e.target.parentElement;
+  const playerBoardNumber = e.target.parentElement.classList[1];
+
+  const mouseoverCell = e.target;
+  const position = [...playerBoard.children].indexOf(mouseoverCell);
+
+  const player = (playerBoardNumber === 'player1') ? player1 : player2;
+  const ship = player.board.ships[movedShip[1]];
+
+  // Prevent that the ship is displayed on the wrong board
+  if (playerBoardNumber !== movedShip[0]) return;
+
+  // Get future ship positions
+  const futurePosition = [];
+  const isVertical = ship[2];
+
+  for (let n = 0; n < ship[1].length; n++) {
+    let pos;
+
     if (isVertical) {
-      posX = pos[0] + index;
-      posY = pos[1];
+      pos = position + (10 * n);
     } else {
-      posX = pos[0];
-      posY = pos[1] + index;
+      pos = position + n;
     }
-    futureShipPos.push([posX, posY]);
+
+    futurePosition.push(pos);
   }
 
-  // Stringify future ship position
-  const futureShipPosStr = modifyArray.toStringify(futureShipPos);
+  dom.clearBoard(playerBoard);
+  dom.displayShips(player.board, playerBoard);
 
-  // Get board position which are not valid (already used by another ship)
-  const invalidPosition = getPosition(gameboardShip, [])[1];
-  // Stringify  invalidPosition
-  const invalidPositionStr = modifyArray.toStringify(invalidPosition);
+  // Check if the ship future position is valid...
+  const isPositionValid = player.board.checkPosition(
+    futurePosition,
+    isVertical,
+    ship[1],
+    player.board.allShipsPosition,
+  );
 
-  for (let index = 0; index < futureShipPosStr.length; index++) {
-    const element = futureShipPosStr[index];
-    if (invalidPositionStr.includes(element)) return false;
+  // ... Show ship future position on the board
+  dom.placeShip(playerBoard, position, ship[1].length, ship[2], isPositionValid);
+}));
+
+DomBoard.forEach((board) => board.addEventListener('click', (e) => {
+  // When player click on a cell...
+
+  // Ignore click if it's not a board cell
+  if (![...e.target.classList].includes('cell')) return;
+
+  // Get player board and board number
+  const playerBoard = e.target.parentElement;
+  const playerBoardNumber = e.target.parentElement.classList[1];
+
+  // Get cell DOM reference and position
+  const cell = e.target;
+  const position = [...playerBoard.children].indexOf(cell);
+
+  const player = (playerBoardNumber === 'player1') ? player1 : player2;
+
+  switch (gameStatus) {
+    case 'game':
+      // Check that active player is using the correct board.
+      if (activePlayer === playerBoardNumber) return;
+
+      // Check if it's a valid position, the cell should not have been used already...
+      if (player.board.missed.includes(position) || player.board.hit.includes(position)) return;
+
+      // ...If it's valid, use Gameboard method receiveAttack
+      player.board.receiveAttack(position);
+
+      // Update the dom...
+      dom.displayMiss(player.board, playerBoard); // attack that missed
+      dom.displayHit(player.board, playerBoard); // attack that hit
+
+      // Check if all ship are sunk...
+      if (player.board.areShipsSunk()) {
+        // If yes, show "you won" on the board
+        dom.displayMessage('You Won!', '', 'win');
+        gameStatus = 'ended';
+      }
+
+      // Alternate between the player
+      (activePlayer === 'player1') ? activePlayer = 'player2' : activePlayer = 'player1';
+
+      // Player 2 is played by the IA (hit a random position)
+      if (activePlayer === 'player2') {
+        iaPlay();
+        activePlayer = 'player1';
+      }
+
+      break;
+
+    case 'movingShip':
+      // Place ship being moved at a new position...
+
+      // Prevent that a ship is moved across player 1 and player 2 board
+      if (playerBoardNumber !== movedShip[0]) return;
+
+      // Update ship position in the player gameboard object
+      player.board.moveShip(position, movedShip[1]);
+
+      // update DOM
+      dom.clearBoard(playerBoard);
+      dom.displayShips(player.board, playerBoard);
+
+      gameStatus = 'init';
+      break;
+
+    case 'init':
+      // If the user click on a ship, start to move it...
+
+      // check if cell is used by a ship...
+      if (player.board.allShipsPosition.includes(position)) {
+        // If yes, get ship object...
+        for (const key in player.board.ships) {
+          const ship = player.board.ships[key];
+
+          if (ship[1].includes(position)) {
+            movedShip = [playerBoardNumber, key];
+          }
+        }
+
+        // Moving Ship
+        gameStatus = 'movingShip';
+      }
+      break;
+
+    default:
+      break;
   }
+}));
 
-  // Check if future ship overflow the board (pos x or pos y > 9)
-  for (let index = 0; index < futureShipPos.length; index++) {
-    const element = futureShipPos[index];
-    if (element[0] > 9 || element[1] > 9) return false;
+DomBoard.forEach((board) => board.addEventListener('dblclick', (e) => {
+  // If the user double click on a ship, rotate it...
+
+  // Ignore click if it's not a board cell
+  if (![...e.target.classList].includes('cell')) return;
+  if (gameStatus !== 'init') return; // Game should be in init status
+
+  // Get player board and board number
+  const playerBoard = e.target.parentElement;
+  const playerBoardNumber = e.target.parentElement.classList[1];
+
+  // Get cell DOM reference and position
+  const cell = e.target;
+  const position = [...playerBoard.children].indexOf(cell);
+
+  const player = (playerBoardNumber === 'player1') ? player1 : player2;
+
+  // check if cell is used by a ship...
+  if (player.board.allShipsPosition.includes(position)) {
+    gameStatus = 'rotatingShip';
+
+    // Rotate the ship using gameboard method
+    player.board.rotateShip(position);
+
+    // update DOM
+    dom.clearBoard(playerBoard);
+    dom.displayShips(player.board, playerBoard);
   }
-
-  return true;
-}
-
-export { subtractArray, getPosition, checkPosition };
+  gameStatus = 'init';
+}));

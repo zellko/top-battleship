@@ -1,3 +1,9 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 @font-face {
     font-family: 'poppins';
     src: url('./font/Poppins-Regular.ttf') format('truetype');
@@ -14,17 +20,201 @@
 
 body{
     font-family: 'poppins', serif;
-    font-weight: bold;
     height: 100vh;
-    background-color: aquamarine;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+body > div{
+    width: 100%;
+}
+
+h1{
+    font-size: 2.5rem;
+}
+
+h2{
+    font-size: 1.5rem;
+}
+
+h4{
+    font-size: 1 rem;
 }
 
 p {
-    color: red;
 }
 
-.imgtest{
-    background: url('./img/cloud-question.png');
-    background-repeat: no-repeat;
-    height: 64px;
+.header{
+    padding: 32px 0 ;
+    display: flex;
+    justify-content: center;
+}
+
+.content{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+.board-container{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+.display{
+    padding: 16px;
+    border: 3px solid blue;
+    background-color: lightblue;
+
+    min-width: 320px;
+    max-width: 360px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+}
+
+.message{
+    font-style: italic;
+    font-size: 0.8rem;
+}
+
+.message-italic{
+    font-style: italic;
+    font-size: 0.8rem;
+}
+
+.button-div{
+    margin-top: auto;
+}
+
+.player, 
+.cp{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid lightblue;
+}
+
+.board-container p{
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+.board,
+.board{
+    display: flex;
+    flex-wrap: wrap;
+    width: 258px;
+    aspect-ratio: 1;
+    z-index: 1;
+}
+
+.cell{
+    border: 1px solid lightgray;
+    flex: 1 0 10%;
+    transition: all 0.15s linear;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 25.8px;
+    aspect-ratio: 1;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.footer{
+    padding: 16px 0 ;
+}
+
+/*
+JS CLASS
+*/
+
+.moving{
+    background-color: lightseagreen
+}
+
+.moving-invalid{
+    background-color: lightcoral ;
+}
+
+.moving-invalid::after{
+    content: "🚫";
+}
+
+.hide{
+    display: none;
+}
+
+.win{
+    background-color: lightgreen;
+}
+
+.lost{
+    background-color: lightcoral;
+}
+
+.ship{
+    background-color: rgb(144, 238, 144);
+    border: 0;
+}
+
+.miss{
+    background-color: lightblue;
+}
+
+.miss::after{
+    content: "·";
+}
+
+.hit{
+    background-color: lightcoral;
+}
+
+.hit::after{
+    content: "×";
+}
+
+/**/
+
+.shake{
+    animation: shaking 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shaking {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+      }
+      20%, 80% {
+        transform: translate3d(2px, 0, 0);
+      }
+      30%, 50%, 70% {
+        transform: translate3d(-4px, 0, 0);
+      }
+      40%, 60% {
+        transform: translate3d(4px, 0, 0);
+      }
+}
+
+/*test*/
+
+.tdrag{
+    border: 1px solid lightgreen;
+    height: 25.8px ;
+    width: calc(25.8px*3);
+    cursor: grabbing;
 }

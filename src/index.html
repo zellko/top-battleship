@@ -7,12 +7,39 @@
     <title>Battleship</title>
 </head>
 <body>
+    <div class="header">
+        <h1>BattleShip</h1>
+    </div>
 
-    <h1>Webpack Setup</h1>
-    <p>Webpack Setup</p>
-    <div class="imgtest"></div>
-  
+    <div class="content">
 
-    <script src="main.bundle.js"></script>
+        <div class="board-container">
+            <div class="player">
+                <p>Player Board</p>
+                <div class="board player1"></div>
+            </div>
+
+            <div class="cp">
+                <p>Computer Board</p>
+                <div class="board player2"></div>
+            </div>
+        </div>
+
+        <div class="display">
+            <h2 class="state">Place your ships!</h2>
+            <p class="message">Click on a ship to move it, double click to rotate it!</p>
+            <div class="button-div">
+                <button class="btn-random">Random</button>
+                <button class="btn-start">Start Game</button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="footer">
+        <p>2022 @Zellko</p>
+    </div>
+
 </body>
 </html>
