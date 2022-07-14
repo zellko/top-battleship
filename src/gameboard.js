@@ -5,11 +5,11 @@ const Gameboard = () => {
   const hit = [];
   const ships = { };
 
-  function checkPosition(shipPosition, isVertical, oldShipPosition) {
+  function checkPosition(shipPosition, isVertical, oldShipPosition, allShipsPos) {
     // Function to check if position is valid
 
     // First, we remove shipPosition from allShipsPosition
-    const shipsPositions = [...allShipsPosition];
+    const shipsPositions = [...allShipsPos];
 
     if (oldShipPosition !== undefined) {
       const index = shipsPositions.indexOf(oldShipPosition[0]);
@@ -21,8 +21,8 @@ const Gameboard = () => {
 
     // Check that ship is not adjacent to another ship...
     const isAdjacent = shipPosition.some((element) => {
-      if (shipsPositions.includes(element + 1) && Math.floor(element / 10) === Math.floor((element + 1) / 10)) return true;
-      if (shipsPositions.includes(element - 1) && Math.floor(element / 10) === Math.floor((element - 1) / 10)) return true;
+      if (shipsPositions.includes(element + 1) && Math.floor(element / 10) === Math.floor((element + 1) / 10)) { return true; }
+      if (shipsPositions.includes(element - 1) && Math.floor(element / 10) === Math.floor((element - 1) / 10)) { return true; }
       if (shipsPositions.includes(element + 10)) return true;
       if (shipsPositions.includes(element - 10)) return true;
       return false;
@@ -105,7 +105,7 @@ const Gameboard = () => {
         }
 
         // Check that position is valid...
-        if (!checkPosition(shipPosition, isVertical)) continue;
+        if (!checkPosition(shipPosition, isVertical, undefined, allShipsPosition)) continue;
 
         isValid = true;
 
@@ -166,7 +166,7 @@ const Gameboard = () => {
             : newShipPosition.push(firstShipPosition + (10 * index));
         });
 
-        const isValid = (checkPosition(newShipPosition, !isVertical, oldShipPosition));
+        const isValid = (checkPosition(newShipPosition, !isVertical, oldShipPosition, allShipsPosition));
 
         if (!isValid) return 'error';
 
@@ -190,7 +190,7 @@ const Gameboard = () => {
       newShipPosition.push(pos);
     }
 
-    const isValid = (checkPosition(newShipPosition, isVertical, oldShipPosition));
+    const isValid = (checkPosition(newShipPosition, isVertical, oldShipPosition, allShipsPosition));
 
     if (!isValid) return 'error';
 
@@ -215,6 +215,7 @@ const Gameboard = () => {
     missed,
     hit,
     areShipsSunk,
+    checkPosition,
     placeShip,
     placeShipsRandomly,
     receiveAttack,
