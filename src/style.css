@@ -18,13 +18,23 @@
     font-style: bold;
 }
 
+:root{
+    --hit: #d4595d;
+    --ship: #97eba5;
+    --ship-moving: #76b6c4;
+    --miss: #7fcdff;
+    --win: #97e5a0;
+    --text-dark: #064273;
+    --display-bg : #def3f6;
+}
+
 body{
     font-family: 'poppins', serif;
-    height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    color: var(--text-dark);
+    height: 100vh;
 }
 
 body > div{
@@ -39,19 +49,20 @@ h2{
     font-size: 1.5rem;
 }
 
-h4{
-    font-size: 1 rem;
-}
-
-p {
-}
+/******************
+HEADER
+******************/
 
 .header{
-    padding: 32px 0 ;
+    padding: 32px 0;
     display: flex;
     justify-content: center;
+
 }
 
+/******************
+CONTENT
+******************/
 .content{
     flex: 1;
     display: flex;
@@ -68,10 +79,16 @@ p {
     gap: 16px;
 }
 
+/******************
+DISPLAY
+- Show the rules
+- Show if win or loose
+******************/
+
 .display{
     padding: 16px;
-    border: 3px solid blue;
-    background-color: lightblue;
+    border: 1px solid var(--text-dark);
+    background-color: var(--display-bg);
 
     min-width: 320px;
     max-width: 360px;
@@ -99,14 +116,34 @@ p {
     margin-top: auto;
 }
 
-.player, 
-.cp{
+button{
+    padding: 8px 0px;
+    width: 108px;
+    border: 1px solid var(--text-dark);
+    background-color: var(--miss);
+    font-weight: 300;
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover{
+    cursor: pointer;
+    border: 1px solid var(--miss);
+    background-color: var(--text-dark);
+    color: var(--display-bg);
+    }
+
+/******************
+GAME BOARD
+******************/
+
+.p1-container, 
+.p2-container{
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: 3px solid lightblue;
+    border: 1px solid var(--text-dark);
 }
 
 .board-container p{
@@ -114,7 +151,6 @@ p {
     font-weight: 300;
 }
 
-.board,
 .board{
     display: flex;
     flex-wrap: wrap;
@@ -124,7 +160,7 @@ p {
 }
 
 .cell{
-    border: 1px solid lightgray;
+    border: 1px dotted var(--miss);
     flex: 1 0 10%;
     transition: all 0.15s linear;
     display: flex;
@@ -136,20 +172,45 @@ p {
     font-size: 1.1rem;
 }
 
+/******************
+GAME BOARD
+******************/
+
 .footer{
-    padding: 16px 0 ;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid var(--text-dark);
 }
 
+
+.footer a{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+svg{
+    color: var(--text-dark);
+    transition: all 0.2s ease-in-out;
+}
+
+svg:hover{
+    color: var(--miss);
+    transform: scale(1.1);
+}
 /*
 JS CLASS
 */
 
 .moving{
-    background-color: lightseagreen
+    background-color: var(--ship-moving)
 }
 
 .moving-invalid{
-    background-color: lightcoral ;
+    background-color: var(--hit) ;
 }
 
 .moving-invalid::after{
@@ -161,20 +222,20 @@ JS CLASS
 }
 
 .win{
-    background-color: lightgreen;
+    background-color: var(--win);
 }
 
 .lost{
-    background-color: lightcoral;
+    background-color: var(--hit);
 }
 
 .ship{
-    background-color: rgb(144, 238, 144);
+    background-color:var(--ship);
     border: 0;
 }
 
 .miss{
-    background-color: lightblue;
+    background-color: var(--miss);
 }
 
 .miss::after{
@@ -182,39 +243,9 @@ JS CLASS
 }
 
 .hit{
-    background-color: lightcoral;
+    background-color: var(--hit);
 }
 
 .hit::after{
     content: "×";
-}
-
-/**/
-
-.shake{
-    animation: shaking 0.82s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-@keyframes shaking {
-    10%, 90% {
-        transform: translate3d(-1px, 0, 0);
-      }
-      20%, 80% {
-        transform: translate3d(2px, 0, 0);
-      }
-      30%, 50%, 70% {
-        transform: translate3d(-4px, 0, 0);
-      }
-      40%, 60% {
-        transform: translate3d(4px, 0, 0);
-      }
-}
-
-/*test*/
-
-.tdrag{
-    border: 1px solid lightgreen;
-    height: 25.8px ;
-    width: calc(25.8px*3);
-    cursor: grabbing;
 }

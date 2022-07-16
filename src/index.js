@@ -66,7 +66,7 @@ randomShipPlacement(DomBoard[1], player2.board);
 
 // Display them on the screen
 dom.displayShips(player1.board, DomBoard[0]);
-dom.displayShips(player2.board, DomBoard[1]);
+// dom.displayShips(player2.board, DomBoard[1]);
 
 /** ***********************
 EVENT LISTENER
